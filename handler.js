@@ -1,8 +1,23 @@
 /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: true}}] */
 const slack = require('slack');
 const configLib = require('./config');
+const P = require('bluebird');
 
 const selfRegex = new RegExp(/<@U8A9A7YT0>/ig);
+
+function isABotMessage(event) {
+  return event.bot_id;
+}
+
+function handleAtMessage(config, slackEvent) {
+  return slack.chat.postMessage({
+    token: config.slack.token,
+    channel: slackEvent.channel,
+    text: 'Leave me out of this.',
+    user: slackEvent.user,
+  })
+    .then((res) => { console.log('Message sent: ', res); });
+}
 
 module.exports.events_create = (event, context, callback) => {
   const body = JSON.parse(event.body);
@@ -20,36 +35,33 @@ module.exports.events_create = (event, context, callback) => {
 
   console.log(body);
 
+  let slackEvent = body.event;
   // ignore bots
-  if (body.event.bot_id) {
+  if (isABotMessage(slackEvent)) {
     return callback(null, { statusCode: 200 });
   }
 
-  let channel;
-  switch (body.event.type) {
+  let result;
+  switch (slackEvent.type) {
     case 'reaction_added':
-      channel = body.event.item.channel;
+      // reaction message
+      slackEvent = slackEvent.item;
+      result = P.resolve();
       break;
     default:
-      channel = body.event.channel;
-      // ignore messages not sent to the bot
-      if (!selfRegex.test(body.event.text)) {
-        return callback(null, { statusCode: 200 });
+      // only process messages sent to the bot
+      if (selfRegex.test(slackEvent.text)) {
+      // process @ message
+        result = configLib.load()
+          .then((config) => {
+          // post the message back to the channel
+            return handleAtMessage(config, slackEvent);
+          })
+          .catch((e) => {
+            console.log(e);
+            return callback(null, { statusCode: 500 });
+          });
       }
-      break;
   }
-
-  return configLib.load()
-    .then((config) => {
-      // post the message back to the channel
-      return slack.chat.postMessage({
-        token: config.slack.token, channel, text: 'Leave me out of this.', user: body.event.user,
-      });
-    })
-    .then((res) => { console.log('Message sent: ', res); })
-    .then(() => { callback(null, { statusCode: 200 }); })
-    .catch((e) => {
-      console.log(e);
-      return callback(null, { statusCode: 500 });
-    });
+  return result.then(() => callback(null, { statusCode: 200 }));
 };
