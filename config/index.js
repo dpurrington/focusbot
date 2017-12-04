@@ -1,15 +1,11 @@
 const AwsSecrets = require('aws-secrets');
 const development = require('./development');
-const production = require('./production');
-
-/* eslint import/no-extraneous-dependencies: 0, import/no-webpack-loader-syntax:0, import/no-unresolved: 0 */
-const secrets = require('./secrets.txt');
+const P = require('bluebird');
+const fs = P.promisifyAll(require('fs'));
 
 // return the config that matches the stage
 function getBaseConfig(stage) {
   switch (stage) {
-    case 'production':
-      return production;
     default:
       return development;
   }
@@ -22,7 +18,10 @@ exports.load = (stage, skipSecrets) => {
   if (!skipSecrets) {
     const awsSecrets = new AwsSecrets(baseConfig.masterKeyArn);
     // decrypt and apply secrets to the config object
-    return awsSecrets.applySecrets(secrets, baseConfig);
+    return fs.readFileAsync('./config/secrets.txt', 'utf-8')
+      .then((secrets) => {
+        return awsSecrets.applySecrets(secrets, baseConfig);
+      });
   }
   return Promise.resolve(baseConfig);
 };
