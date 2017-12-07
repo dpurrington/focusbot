@@ -10,10 +10,15 @@ function isABotMessage(event) {
 }
 
 function handleAtMessage(config, slackEvent) {
+  let response = 'Leave me out of this';
+  if (/time$/.test(slackEvent.text)) {
+    response = new Date(Date.now()).toTimeString();
+  }
+
   return slack.chat.postMessage({
     token: config.slack.token,
     channel: slackEvent.channel,
-    text: 'Leave me out of this.',
+    text: response,
     user: slackEvent.user,
   })
     .then((res) => { console.log('Message sent: ', res); });
