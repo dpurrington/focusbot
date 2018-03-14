@@ -10,7 +10,7 @@ function isABotMessage(event) {
 }
 
 function handleAtMessage(config, slackEvent) {
-  let response = 'Leave me out of this';
+  let response = 'Leave me out of this, please. I am doing a demo.';
   if (/time$/.test(slackEvent.text)) {
     response = new Date(Date.now()).toTimeString();
   }

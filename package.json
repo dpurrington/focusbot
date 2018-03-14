@@ -5,8 +5,8 @@
   "main": "handler.js",
   "kmsKey": "55b05579-cd8a-49e5-8055-f63785044e06",
   "scripts": {
-    "test": "mocha-webpack --webpack-config ./webpack.config.js ./test/**/*_test.js && eslint --ignore-path .gitignore .",
-    "watch": "mocha --compilers js:babel-core/register test/**/*_test.js --watch",
+    "test": "node_modules/.bin/mocha-webpack --webpack-config ./webpack.config.js ./test/**/*_test.js && eslint --ignore-path .gitignore .",
+    "watch": "node_modules/.bin/mocha --compilers js:babel-core/register test/**/*_test.js --watch",
     "start": "nodemon handler.js",
     "encrypt": "aws-secrets encrypt-file config/.secrets.json config/secrets.txt -k $npm_package_kmsKey && rm config/.secrets.json",
     "decrypt": "aws-secrets decrypt-file config/secrets.txt config/.secrets.json"
@@ -24,6 +24,7 @@
     "eslint-plugin-react": "^7.5.1",
     "json-loader": "^0.5.7",
     "mocha": "^4.0.1",
+    "mocha-webpack": "^1.0.1",
     "nock": "^9.1.4",
     "nodemon": "^1.12.1",
     "serverless": "^1.24.1",
@@ -37,6 +38,7 @@
     "request": "^2.79.0",
     "request-promise": "^4.2.2",
     "slack": "^9.0.9",
+    "tiny-json-http": "^7.0.0",
     "winston": "^2.4.0"
   }
 }
