@@ -1,0 +1,18 @@
+{
+  "retainLines": true,
+  "presets": [
+    "env",
+    "flow"
+  ],
+  "plugins": [
+    "external-helpers",
+    [
+      "transform-runtime",
+      {
+        "polyfill": false,
+        "regenerator": true
+      }
+    ],
+    "rewire"
+  ]
+}
