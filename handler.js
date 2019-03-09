@@ -1,9 +1,7 @@
-// @flow
-
 const slack = require('slack');
-const configLib = require('./config');
 
 const selfRegex = new RegExp(/<@U8A9A7YT0>/ig);
+const { SLACK_TOKEN } = process.env;
 
 function isABotMessage(event) {
   return event.bot_id;
@@ -24,7 +22,7 @@ async function handleAtMessage(config, slackEvent) {
   console.log('Message sent: ', res);
 }
 
-module.exports.events_create = async (event: any, context: any, callback: any) => {
+module.exports.events_create = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body);
 
@@ -56,7 +54,6 @@ module.exports.events_create = async (event: any, context: any, callback: any) =
         // only process messages sent to the bot
         if (selfRegex.test(slackEvent.text)) {
         // process @ message
-          const config = await configLib.load();
           // post the message back to the channel
           return handleAtMessage(config, slackEvent);
         }

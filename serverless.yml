@@ -1,20 +1,10 @@
 service: focusbot
 plugins:
   - serverless-webpack
-  
+
 provider:
   name: aws
   runtime: nodejs6.10
-
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-      - "kms:Encrypt"
-      - "kms:Decrypt"
-      - "kms:ReEncrypt*"
-      - "kms:GenerateDataKey*"
-      - "kms:DescribeKey"
-      Resource: "arn:aws:kms:us-east-1:296177645092:key/55b05579-cd8a-49e5-8055-f63785044e06"
 
 functions:
   main:
