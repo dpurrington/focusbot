@@ -1,20 +1,20 @@
 const slack = require('slack');
 
-const selfRegex = new RegExp(/<@U8A9A7YT0>/ig);
+// const selfRegex = new RegExp(/<@U8A9A7YT0>/ig);'BGU7U5J8M',
 const { SLACK_TOKEN } = process.env;
 
 function isABotMessage(event) {
-  return event.bot_id;
+  return (event.subtype && event.subtype === 'bot_message');
 }
 
-async function handleAtMessage(config, slackEvent) {
+async function handleAtMessage(slackEvent) {
   let response = 'You\'re not focusing. Get back to work.';
   if (/time$/.test(slackEvent.text)) {
     response = new Date(Date.now()).toTimeString();
   }
 
   const res = await slack.chat.postMessage({
-    token: config.slack.token,
+    token: SLACK_TOKEN,
     channel: slackEvent.channel,
     text: response,
     user: slackEvent.user,
@@ -28,6 +28,7 @@ module.exports.events_create = async (event, context, callback) => {
 
     // verification request
     if (body.challenge) {
+      console.log('received challenge');
       return callback(null, {
         statusCode: 200,
         headers: {
@@ -42,6 +43,7 @@ module.exports.events_create = async (event, context, callback) => {
     let slackEvent = body.event;
     // ignore bots
     if (isABotMessage(slackEvent)) {
+      console.log('is bot message')
       return callback(null, { statusCode: 200 });
     }
 
@@ -51,12 +53,11 @@ module.exports.events_create = async (event, context, callback) => {
         slackEvent = slackEvent.item;
         break;
       default:
-        // only process messages sent to the bot
-        if (selfRegex.test(slackEvent.text)) {
+  //      if (selfRegex.test(slackEvent.text)) {
         // process @ message
           // post the message back to the channel
-          return handleAtMessage(config, slackEvent);
-        }
+          handleAtMessage(slackEvent);
+   //   }
     }
     return callback(null, { statusCode: 200 });
   } catch (e) {
