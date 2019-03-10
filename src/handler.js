@@ -1,6 +1,5 @@
 const slack = require('slack');
 
-// const selfRegex = new RegExp(/<@U8A9A7YT0>/ig);'BGU7U5J8M',
 const { SLACK_TOKEN } = process.env;
 
 function isABotMessage(event) {
@@ -53,11 +52,7 @@ module.exports.events_create = async (event, context, callback) => {
         slackEvent = slackEvent.item;
         break;
       default:
-  //      if (selfRegex.test(slackEvent.text)) {
-        // process @ message
-          // post the message back to the channel
-          handleAtMessage(slackEvent);
-   //   }
+        handleAtMessage(slackEvent);
     }
     return callback(null, { statusCode: 200 });
   } catch (e) {
