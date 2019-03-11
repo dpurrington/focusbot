@@ -8,7 +8,7 @@ provider:
 
 functions:
   main:
-    handler: handler.events_create
+    handler: src/handler.events_create
     events:
       - http:
          path: events/create

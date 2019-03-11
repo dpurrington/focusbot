@@ -1,4 +1,5 @@
 const slack = require('slack');
+const processors = require('./processors');
 
 const { SLACK_TOKEN } = process.env;
 
@@ -6,11 +7,11 @@ function isABotMessage(event) {
   return (event.subtype && event.subtype === 'bot_message');
 }
 
-async function handleAtMessage(slackEvent) {
-  let response = 'You\'re not focusing. Get back to work.';
-  if (/time$/.test(slackEvent.text)) {
-    response = new Date(Date.now()).toTimeString();
-  }
+async function handleMessage(slackEvent) {
+  console.log(slackEvent);
+  console.log(processors);
+  const command = slackEvent.text.split(' ')[1];
+  const response = processors[command].process(slackEvent);
 
   const res = await slack.chat.postMessage({
     token: SLACK_TOKEN,
@@ -21,38 +22,40 @@ async function handleAtMessage(slackEvent) {
   console.log('Message sent: ', res);
 }
 
+async function handleChallenge(event) {
+  console.log('received challenge');
+  return callback(null, {
+    statusCode: 200,
+    headers: {
+      'Content-type': 'text/plain',
+    },
+    body: event,
+  });
+}
+
 module.exports.events_create = async (event, context, callback) => {
   try {
     const body = JSON.parse(event.body);
 
-    // verification request
+    // verification message
     if (body.challenge) {
-      console.log('received challenge');
-      return callback(null, {
-        statusCode: 200,
-        headers: {
-          'Content-type': 'text/plain',
-        },
-        body: body.challenge,
-      });
+      handleChallenge(body.challenge)
+      return callback(null, { statusCode: 200 });
     }
 
     console.log(body);
-
     let slackEvent = body.event;
     // ignore bots
     if (isABotMessage(slackEvent)) {
-      console.log('is bot message')
       return callback(null, { statusCode: 200 });
     }
 
     switch (slackEvent.type) {
       case 'reaction_added':
-        // reaction message
         slackEvent = slackEvent.item;
         break;
       default:
-        handleAtMessage(slackEvent);
+        await handleMessage(slackEvent);
     }
     return callback(null, { statusCode: 200 });
   } catch (e) {

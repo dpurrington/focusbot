@@ -7,7 +7,7 @@
     "test": "mocha ./test/**/*_test.js && eslint --ignore-path .gitignore .",
     "lint": "eslint src",
     "watch": "mocha test/**/*_test.js --watch",
-    "start": "nodemon handler.js",
+    "start": "nodemon src/handler.js"
   },
   "author": "TOCOMPLETE",
   "license": "ISC",
