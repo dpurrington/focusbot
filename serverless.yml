@@ -5,6 +5,7 @@ provider:
   runtime: nodejs8.10
   environment:
     SLACK_TOKEN: ${env:SLACK_TOKEN}
+    GITHUB_TOKEN: ${env:GITHUB_TOKEN}
 
 functions:
   main:

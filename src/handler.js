@@ -1,7 +1,13 @@
 const slack = require('slack');
 const processors = require('./processors');
+const LRU = require('lru-cache');
 
 const { SLACK_TOKEN } = process.env;
+
+const cache = new LRU({
+  max: 10,
+  maxAge: 1000 * 30
+});
 
 function isABotMessage(event) {
   return (event.subtype && event.subtype === 'bot_message');
@@ -9,9 +15,13 @@ function isABotMessage(event) {
 
 async function handleMessage(slackEvent) {
   console.log(slackEvent);
-  console.log(processors);
+
+  // we get dups, this is to make sure we don't repeat ourselves
+  if (cache.get(slackEvent.client_msg_id)) return;
+  cache.set(slackEvent.client_msg_id, true);
+
   const command = slackEvent.text.split(' ')[1];
-  const response = processors[command].process(slackEvent);
+  const response = await (processors[command].process(slackEvent));
 
   const res = await slack.chat.postMessage({
     token: SLACK_TOKEN,

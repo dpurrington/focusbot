@@ -28,8 +28,10 @@
   },
   "dependencies": {
     "@slack/client": "^3.14.2",
+    "axios": "^0.18.0",
     "bluebird": "^3.5.1",
     "lodash.map": "^4.6.0",
+    "lru-cache": "^5.1.1",
     "request": "^2.79.0",
     "request-promise": "^4.2.2",
     "slack": "^9.0.9",
