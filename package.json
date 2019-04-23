@@ -6,8 +6,8 @@
   "scripts": {
     "test": "mocha ./test/**/*_test.js && eslint --ignore-path .gitignore .",
     "lint": "eslint src",
-    "watch": "mocha --compilers js:babel-core/register test/**/*_test.js --watch",
-    "start": "nodemon handler.js",
+    "watch": "mocha test/**/*_test.js --watch",
+    "start": "nodemon src/handler.js"
   },
   "author": "TOCOMPLETE",
   "license": "ISC",
@@ -20,17 +20,18 @@
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.5.1",
     "mocha": "^4.0.1",
-    "mocha-webpack": "^1.0.1",
     "nock": "^9.1.4",
     "nodemon": "^1.12.1",
     "raw-loader": "^0.5.1",
     "serverless": "^1.24.1",
-    "simple-mock": "^0.8.0",
+    "simple-mock": "^0.8.0"
   },
   "dependencies": {
     "@slack/client": "^3.14.2",
+    "axios": "^0.18.0",
     "bluebird": "^3.5.1",
     "lodash.map": "^4.6.0",
+    "lru-cache": "^5.1.1",
     "request": "^2.79.0",
     "request-promise": "^4.2.2",
     "slack": "^9.0.9",
