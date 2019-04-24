@@ -13,6 +13,13 @@ function isABotMessage(event) {
   return (event.subtype && event.subtype === 'bot_message');
 }
 
+function getCommand(slackEvent) {
+  if (slackEvent.channel_type && slackEvent.channel_type === 'im') {
+    return slackEvent.text;
+  }
+  return slackEvent.text.split(' ')[1];
+}
+
 async function handleMessage(slackEvent) {
   console.log(slackEvent);
 
@@ -20,8 +27,12 @@ async function handleMessage(slackEvent) {
   if (cache.get(slackEvent.client_msg_id)) return;
   cache.set(slackEvent.client_msg_id, true);
 
-  const command = slackEvent.text.split(' ')[1];
-  const response = await (processors[command].process(slackEvent));
+  const command = getCommand(slackEvent);
+  const processor = processors[command];
+
+  if (!processor) return;
+
+  const response = await processor.process(slackEvent);
 
   const res = await slack.chat.postMessage({
     token: SLACK_TOKEN,
